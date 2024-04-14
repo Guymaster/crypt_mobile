@@ -114,7 +114,6 @@ class CreateFilePopUpState extends State<CreateFilePopUp> {
       ),
       title: Text("Add new data", style: FormTitleTxtStyle.classic(20, ColorPalette.getWhite(1)),),
       content: SizedBox(
-        width: 600,
         child: SingleChildScrollView(
           child: Form(
             key: _formKey,

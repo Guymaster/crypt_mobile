@@ -8,8 +8,8 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() async {
   runApp(const MyApp());
-  sqfliteFfiInit();
-  databaseFactory = databaseFactoryFfi;
+  //sqfliteFfiInit();
+  //databaseFactory = databaseFactoryFfi;
 }
 
 class MyApp extends StatelessWidget {

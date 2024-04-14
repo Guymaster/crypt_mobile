@@ -10,6 +10,7 @@ import 'package:crypt_mobile/services/database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import '../../models/collection.model.dart';
@@ -82,7 +83,6 @@ class RegistryPageState extends State<RegistryPage> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15)
           ),
-          mini: MQ.getWidth(context) < 800,
           onPressed: () {
             if(secretKeyProvider.value.isEmpty) return;
             showDialog(
@@ -100,182 +100,102 @@ class RegistryPageState extends State<RegistryPage> {
           child: const Icon(Icons.add),
         ),
       ),
+      drawer: Container(
+        width: 200,
+        height: MQ.getHeight(context) - WINDOW_HEADER_HEIGHT,
+        decoration: BoxDecoration(
+            color: ColorPalette.getDarkGray(1),
+            border: Border.all(
+              width: 0,
+              color: ColorPalette.getDarkGray(1),
+            )
+        ),
+        child: ListView.builder(
+          itemCount: collections.length,
+          itemBuilder: (context, i) => Padding(
+            padding: EdgeInsets.only(top: (i == 0)? 10 : 0),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 6),
+                  child: Consumer<SecretKeyProvider>(
+                    builder: (context, secretKeyProvider, _) => CollectionItem(
+                      secretKey: secretKeyProvider.value,
+                      onPressed: (String name){
+                        setState(() {
+                          selectedCol = i;
+                        });
+                        fetchFiles();
+                      },
+                      handleEdit: (c) async {
+                        fetchCollections();
+                      },
+                      handleDelete: (c) async {
+                        fetchCollections();
+                      },
+                      collection: collections[i],
+                      selected: (i == selectedCol),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      appBar: AppBar(
+        backgroundColor: ColorPalette.getDarkGray(0),
+        title: Text("Crypt", style: AppNameTxtStyle.classic(17, ColorPalette.getWhite(0.5)),),
+        actions: [
+          Consumer<SecretKeyProvider>(
+            builder: (context, provider, widget) => IconButton(
+                style: ButtonStyle(
+                    shape: MaterialStateProperty.all(const RoundedRectangleBorder())
+                ),
+                color: (provider.value.isEmpty? Colors.red : ColorPalette.getWhite(0.3)),
+                iconSize: 17,
+                onPressed: (){
+                  Provider.of<SecretKeyProvider>(context, listen: false).value.isEmpty?
+                  showDialog(
+                      context: context,
+                      builder: (context){
+                        return const UnlockPopUp();
+                      }
+                  )
+                      :
+                  Provider.of<SecretKeyProvider>(context, listen: false).value = "";
+                },
+                icon: Icon((provider.value.isEmpty? Icons.lock : Icons.lock_open))
+            ),
+          ),
+          Consumer<SecretKeyProvider>(
+            builder: (context, secreKeyProvider, _) => IconButton(
+              style: ButtonStyle(
+                  shape: MaterialStateProperty.all(const RoundedRectangleBorder())
+              ),
+              onPressed: (){
+                if(secreKeyProvider.value.isEmpty) {
+                  return;
+                }
+                Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const SettingsPage()));
+              },
+              iconSize: 20,
+              icon: Icon(Icons.settings, color: secreKeyProvider.value.isNotEmpty? ColorPalette.getWhite(0.4) : ColorPalette.getWhite(0.1),),
+            ),
+          )
+        ],
+      ),
       body: Container(
         height: MQ.getHeight(context),
         width: MQ.getWidth(context),
         color: ColorPalette.getBlack(1),
         child: Column(
           children: [
-            GestureDetector(
-              onPanUpdate: (details){
-                //appWindow.position = appWindow.position + details.globalPosition;
-              },
-              /*dragStartBehavior: DragStartBehavior.,
-              onHorizontalDragUpdate: (details){
-                appWindow.position = appWindow.position + details.delta;
-              },
-              onVerticalDragUpdate: (details){
-                appWindow.position = appWindow.position + details.delta;
-              },*/
-              child: SizedBox(
-                height: WINDOW_HEADER_HEIGHT.toDouble(),
-                width: MQ.getWidth(context),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      height: WINDOW_HEADER_HEIGHT.toDouble(),
-                      width: WINDOW_SIDEBAR_WIDTH.toDouble(),
-                      decoration: BoxDecoration(
-                        color: ColorPalette.getDarkGray(1),
-                        border: Border.all(
-                          width: 0,
-                          color: ColorPalette.getDarkGray(1)
-                        )
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              const SizedBox(width: 10,),
-                              Text("Crypt", style: AppNameTxtStyle.classic(14, ColorPalette.getWhite(0.5)),),
-                            ],
-                          ),
-                          Consumer<SecretKeyProvider>(
-                            builder: (context, provider, widget) => IconButton(
-                              style: ButtonStyle(
-                                shape: MaterialStateProperty.all(const RoundedRectangleBorder())
-                              ),
-                              color: (provider.value.isEmpty? Colors.red : ColorPalette.getWhite(0.3)),
-                              iconSize: 17,
-                              onPressed: (){
-                                Provider.of<SecretKeyProvider>(context, listen: false).value.isEmpty?
-                                  showDialog(
-                                      context: context,
-                                      builder: (context){
-                                        return const UnlockPopUp();
-                                      }
-                                  )
-                                :
-                                  Provider.of<SecretKeyProvider>(context, listen: false).value = "";
-                              },
-                              icon: Icon((provider.value.isEmpty? Icons.lock : Icons.lock_open))
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    Consumer<SecretKeyProvider>(
-                      builder: (context, secreKeyProvider, _) => IconButton(
-                          style: ButtonStyle(
-                              shape: MaterialStateProperty.all(const RoundedRectangleBorder())
-                          ),
-                          onPressed: (){
-                            if(secreKeyProvider.value.isEmpty) {
-                              return;
-                            }
-                            Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const SettingsPage()));
-                          },
-                        iconSize: 15,
-                          icon: Icon(Icons.settings, color: secreKeyProvider.value.isNotEmpty? ColorPalette.getWhite(0.4) : ColorPalette.getWhite(0.1),),
-                          ),
-                    ),
-                    Flexible(
-                      child: Container(color: ColorPalette.getBlack(0),),
-                    ),
-                    Row(
-                      children: [
-                        IconButton(
-                          style: ButtonStyle(
-                            shape: MaterialStateProperty.all(const RoundedRectangleBorder())
-                          ),
-                          onPressed: (){
-                            //appWindow.minimize();
-                          },
-                          icon: SvgPicture.asset("assets/icons/hide-window.svg",
-                          height: 15,
-                          width: 15,
-                        )),
-                        IconButton(
-                            style: ButtonStyle(
-                              shape: MaterialStateProperty.all(const RoundedRectangleBorder())
-                          ),
-                          onPressed: (){
-                          //appWindow.maximizeOrRestore();
-                        }, icon: SvgPicture.asset("assets/icons/maximize-window.svg",
-                          height: 15,
-                          width: 15,
-                        )),
-                        IconButton(
-                          onPressed: (){
-                            //appWindow.close();
-                          },
-                          style: ButtonStyle(
-                              shape: MaterialStateProperty.all(const RoundedRectangleBorder())
-                          ),
-                          icon: SvgPicture.asset("assets/icons/close-window.svg",
-                          height: 15,
-                          width: 15,
-                        )),
-                      ],
-                    )
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(
-              height: MQ.getHeight(context) - WINDOW_HEADER_HEIGHT,
-              width: MQ.getWidth(context),
+            Expanded(
               child: Row(
                 children: [
                   Container(
-                    width: 200,
-                    height: MQ.getHeight(context) - WINDOW_HEADER_HEIGHT,
-                    decoration: BoxDecoration(
-                        color: ColorPalette.getDarkGray(1),
-                        border: Border.all(
-                          width: 0,
-                          color: ColorPalette.getDarkGray(1),
-                        )
-                    ),
-                    child: ListView.builder(
-                      itemCount: collections.length,
-                      itemBuilder: (context, i) => Padding(
-                        padding: EdgeInsets.only(top: (i == 0)? 10 : 0),
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 6),
-                              child: Consumer<SecretKeyProvider>(
-                                builder: (context, secretKeyProvider, _) => CollectionItem(
-                                  secretKey: secretKeyProvider.value,
-                                  onPressed: (String name){
-                                    setState(() {
-                                      selectedCol = i;
-                                    });
-                                    fetchFiles();
-                                  },
-                                  handleEdit: (c) async {
-                                    fetchCollections();
-                                  },
-                                  handleDelete: (c) async {
-                                    fetchCollections();
-                                  },
-                                  collection: collections[i],
-                                  selected: (i == selectedCol),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    width: MQ.getWidth(context) - WINDOW_SIDEBAR_WIDTH,
+                    width: MQ.getWidth(context),
                     height: MQ.getHeight(context) - WINDOW_HEADER_HEIGHT,
                     color: ColorPalette.getBlack(1),
                     child: ListView.builder(

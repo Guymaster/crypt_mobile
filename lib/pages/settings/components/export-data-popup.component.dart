@@ -76,7 +76,7 @@ class UnlockPopUpState extends State<ExportDataPopUp> {
                 children: [
                   const Icon(Icons.folder),
                   const SizedBox(width: 5,),
-                  Text(selectedPath??"Choose an output directory", style: FormLabelTxtStyle.classic(14, ColorPalette.getWhite(1),),
+                  Text(selectedPath??"Output path", style: FormLabelTxtStyle.classic(14, ColorPalette.getWhite(1),),
                   ),
                 ],
               ),),

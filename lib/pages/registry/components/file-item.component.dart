@@ -1,7 +1,7 @@
-import 'package:contextual_menu/contextual_menu.dart';
 import 'package:crypt_mobile/common/dimensions.dart';
 import 'package:crypt_mobile/common/styles.dart';
 import 'package:crypt_mobile/common/values.dart';
+import 'package:crypt_mobile/pages/registry/components/file-menu-popup.component.dart';
 import 'package:crypt_mobile/providers/secret_key.provider.dart';
 import 'package:crypt_mobile/services/encryption.dart';
 import 'package:expandable/expandable.dart';
@@ -39,24 +39,30 @@ class _FileItemState extends State<FileItem> {
     return Consumer<SecretKeyProvider>(
       builder: (BuildContext context, SecretKeyProvider secretKeyProvider, Widget? child) {
         return GestureDetector(
-          onSecondaryTapUp: (details){
+          onLongPress: (){
             if(secretKeyProvider.value.isEmpty) return;
-            popUpContextualMenu(
-              FileItemMenu((){
-                Clipboard.setData(ClipboardData(text: widget.file.content));
-              }, (){
-                if(secretKeyProvider.value.isEmpty) return;
-                widget.handleEdit(widget.file);
-              }, (){
-                if(secretKeyProvider.value.isEmpty) return;
-                widget.handleDelete(widget.file);
-              }),
-              placement: Placement.bottomLeft,
+            showDialog(
+                context: context,
+                builder: (context){
+                  return FileMenuPopUp(
+                    onChooseDelete: (){
+                      if(secretKeyProvider.value.isEmpty) return;
+                      widget.handleDelete(widget.file);
+                    },
+                    onChooseCopy: (){
+                      Clipboard.setData(ClipboardData(text: widget.file.content));
+                    },
+                    onChooseUpdate: (){
+                      if(secretKeyProvider.value.isEmpty) return;
+                      widget.handleEdit(widget.file);
+                    }
+                  );
+                }
             );
           },
           child: Card(
             elevation: 0,
-            color: ColorPalette.getDarkGray(0.5),
+            color: ColorPalette.getDarkGray(1),
             shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(5))
             ),

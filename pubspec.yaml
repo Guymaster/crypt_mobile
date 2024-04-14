@@ -39,7 +39,6 @@ dependencies:
   flutter_svg: ^2.0.10+1
   google_fonts: ^6.2.1
   expandable: ^5.0.1
-  contextual_menu: ^0.1.2
   sqflite: ^2.3.2
   sqflite_common_ffi: ^2.3.3
   dbcrypt: ^2.0.0

@@ -3,7 +3,6 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  contextual_menu
   encrypt_decrypt_plus
   url_launcher_linux
 )

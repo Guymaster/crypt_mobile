@@ -60,7 +60,7 @@ class _CollectionItemState extends State<CollectionItem> {
           mode = ItemMode.VIEW;
         });
       },
-      onSecondaryTapUp: (details){
+      onLongPress: (){
         if(widget.secretKey.isEmpty){
           return;
         }
@@ -103,7 +103,7 @@ class _CollectionItemState extends State<CollectionItem> {
                 )
             ) else const SizedBox(),
             if (mode == ItemMode.MENU) GestureDetector(
-              onSecondaryTapUp: (details){
+              onLongPress: (){
                 setState(() {
                   mode = ItemMode.VIEW;
                 });
@@ -170,7 +170,7 @@ class _CollectionItemState extends State<CollectionItem> {
               child: TextField(
                 focusNode: editFieldFocusNode,
                 controller: textEditingController,
-                textInputAction: TextInputAction.search,
+                textInputAction: TextInputAction.done,
                 textAlignVertical: TextAlignVertical.center,
                 maxLength: 50,
                 onSubmitted: (value) async {
